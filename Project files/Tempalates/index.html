@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Municipal Waste Classification</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .hero-section {
+        height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+          url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23654321" width="1200" height="800"/><path fill="%23333" d="M0,400 Q300,300 600,400 T1200,400 L1200,800 L0,800 Z"/><circle fill="%23228B22" cx="100" cy="150" r="40"/><circle fill="%23228B22" cx="200" cy="100" r="30"/><circle fill="%23228B22" cx="300" cy="120" r="35"/><circle fill="%2387CEEB" cx="900" cy="100" r="50"/><circle fill="%2387CEEB" cx="1000" cy="80" r="40"/><polygon fill="%23696969" points="150,500 200,450 250,500 300,480 350,520 400,500 450,550 500,520 550,580 0,580"/><polygon fill="%23A0A0A0" points="600,520 650,480 700,500 750,460 800,490 850,520 900,500 950,540 1000,520 1200,560 1200,800 600,800"/></svg>')
+            center/cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle fill="%23ffffff" opacity="0.1" cx="20" cy="20" r="2"/><circle fill="%23ffffff" opacity="0.05" cx="80" cy="30" r="1"/><circle fill="%23ffffff" opacity="0.1" cx="40" cy="70" r="1.5"/><circle fill="%23ffffff" opacity="0.05" cx="90" cy="80" r="1"/></svg>')
+          repeat;
+        animation: float 20s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding: 15px 0;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+        letter-spacing: 1px;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      .nav-links a:hover {
+        color: #00a753;
+      }
+
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #00a753;
+        transition: width 0.3s ease;
+      }
+
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .hero-content {
+        text-align: center;
+        color: white;
+        max-width: 800px;
+        z-index: 2;
+        position: relative;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 1s ease-out;
+      }
+
+      .hero-subtitle {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+        font-weight: 300;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 1s ease-out 0.3s both;
+      }
+
+      .hero-description {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        margin-bottom: 40px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 1s ease-out 0.6s both;
+      }
+
+      .cta-button {
+        display: inline-block;
+        background: #00a753;
+        color: white;
+        padding: 15px 35px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 167, 83, 0.4);
+        animation: fadeInUp 1s ease-out 0.9s both;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cta-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .cta-button:hover::before {
+        left: 100%;
+      }
+
+      .cta-button:hover {
+        background: #009349;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 167, 83, 0.6);
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .features {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 40px;
+        color: white;
+        text-align: center;
+        animation: fadeInUp 1s ease-out 1.2s both;
+      }
+
+      .feature-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .feature-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        backdrop-filter: blur(5px);
+      }
+
+      .feature-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+
+        .hero-title {
+          font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+          font-size: 1.4rem;
+        }
+
+        .hero-description {
+          font-size: 1rem;
+          padding: 0 20px;
+        }
+
+        .features {
+          flex-direction: column;
+          gap: 20px;
+          bottom: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-content">
+          <a href="/" class="logo">MUNICIPAL WASTE CLASSIFICATION</a>
+          <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/blog">About</a></li>
+            <li><a href="/predict">Predict</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title">MUNICIPAL WASTE CLASSIFICATION</h1>
+          <h2 class="hero-subtitle">
+            Welcome to municipal waste classification
+          </h2>
+          <p class="hero-description">
+            This platform allows you to upload images of waste materials, and
+            our advanced machine learning model will classify them into
+            appropriate categories. Proper waste classification helps in
+            efficient recycling and waste management, making our environment
+            cleaner and more sustainable.
+          </p>
+          <a href="/predict" class="cta-button">GET STARTED</a>
+        </div>
+      </div>
+
+      <div class="features">
+        <div class="feature-item">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-text">AI-Powered</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🌱</div>
+          <div class="feature-text">Eco-Friendly</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-text">Fast Results</div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // Add smooth scrolling and interactive effects
+      document.addEventListener("DOMContentLoaded", function () {
+        // Navbar scroll effect
+        window.addEventListener("scroll", function () {
+          const navbar = document.querySelector(".navbar");
+          if (window.scrollY > 50) {
+            navbar.style.background = "rgba(255, 255, 255, 0.98)";
+          } else {
+            navbar.style.background = "rgba(255, 255, 255, 0.95)";
+          }
+        });
+
+        // Add hover effects to feature items
+        const featureItems = document.querySelectorAll(".feature-item");
+        featureItems.forEach((item) => {
+          item.addEventListener("mouseenter", function () {
+            this.style.transform = "translateY(-5px)";
+            this.style.transition = "transform 0.3s ease";
+          });
+
+          item.addEventListener("mouseleave", function () {
+            this.style.transform = "translateY(0)";
+          });
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener("scroll", function () {
+          const scrolled = window.pageYOffset;
+          const parallax = document.querySelector(".hero-section");
+          const speed = scrolled * 0.5;
+          parallax.style.transform = `translateY(${speed}px)`;
+        });
+      });
+    </script>
+  </body>
+</html>
