@@ -1,2 +1,2 @@
-# Waste_classification_using_Trasfer_Learning
+# Waste-classification-using-Trasfer-Learning
 Using pretrained model to classify waste for better Waste management
