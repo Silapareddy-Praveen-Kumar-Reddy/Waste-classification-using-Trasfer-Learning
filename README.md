@@ -6,7 +6,7 @@ Using pretrained model to classify waste for better Waste management
 
 The Waste Classification project is an intelligent, Flask-based web system designed for real-time image recognition of municipal solid waste using deep learning. It leverages transfer learning (VGG16) to automate waste categorization, aiming to improve recycling efficiency for better waste management.
 
-## Your Role & Contributions
+## My Role & Contributions
 
 - Part of a four-member team; with another teammate, I led model training using the normalized dataset curated by our team.
 - Represented our team in the validation round to demonstrate model performance and system capabilities.
