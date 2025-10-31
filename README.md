@@ -26,7 +26,7 @@ The Waste Classification project is an intelligent, Flask-based web system desig
 - **Achieving real-time performance for web-based inference.** Solution: Optimized model deployment pipeline.
 - **Ensuring accurate predictions during validation.** Solution: Incorporated validation and refined accuracy with feedback.
 
-## Results or Impact
+## Results and Impact
 
 - Integrated a deep learning model, automating waste categorization and improving recycling efficiency by 25%.
 - Enhanced system usability and user interaction by 40% using full-stack principles and data visualization.
