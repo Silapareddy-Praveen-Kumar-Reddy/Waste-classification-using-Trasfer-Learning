@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.env
+
+# Model files (large binary)
+*.h5
+*.hdf5
+*.tflite
+*.pb
+
+# Uploads
+Project files/static/uploads/*
+!Project files/static/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Waste Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+    
+      @keyframes fade-slide {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade-slide {
+        animation: fade-slide 0.6s ease-out forwards;
+      }
+
+      /* Header Styles */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding: 15px 0;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+        letter-spacing: 1px;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: #00a753;
+      }
+
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #00a753;
+        transition: width 0.3s ease;
+      }
+
+      .nav-links a:hover::after,
+      .nav-links a.active::after {
+        width: 100%;
+      }
+
+      /* Adjust body padding for fixed navbar */
+      body {
+        padding-top: 80px;
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+        
+        .logo {
+          font-size: 1.2rem;
+        }
+      }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        
+        .contact-info {
+            padding: 60px 40px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .info-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .info-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .info-details {
+            color: #64748b;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .info-details a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .info-details a:hover {
+            color: #764ba2;
+        }
+        
+        .map-section {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .map-placeholder {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="3" fill="white" opacity="0.3"/><circle cx="25" cy="25" r="2" fill="white" opacity="0.2"/><circle cx="75" cy="30" r="1.5" fill="white" opacity="0.4"/><circle cx="20" cy="70" r="2.5" fill="white" opacity="0.25"/><circle cx="80" cy="75" r="2" fill="white" opacity="0.35"/></svg>') center/cover;
+        }
+        
+        .map-text {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .cta-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .cta-button:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .cta-button.primary {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+        
+        .cta-button.primary:hover {
+            background: #ff5252;
+            border-color: #ff5252;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .main-content {
+                margin-top: 70px;
+                padding: 10px;
+            }
+            
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-info,
+            .map-section {
+                padding: 40px 20px;
+            }
+            
+            .contact-info {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            
+            .header {
+                padding: 40px 20px 30px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .cta-section {
+                padding: 30px 20px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 200px;
+            }
+        }
+</style>
+</head>
+<body>
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-content">
+          <a href="/" class="logo">MUNICIPAL WASTE CLASSIFICATION</a>
+          <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/predict">Predict</a></li>
+            <li><a href="/contact" class="active">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+        <div class="header">
+            <div class="header-badge">Contact Us</div>
+            <p>We are here to help you make the best choices for a sustainable environment and effective waste management. Reach out to us for more information about our services, or to learn how we can help you ensure proper classification and disposal of municipal waste.</p>
+        </div>
+        
+        <div class="content">
+            <div class="contact-info">
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <div class="info-title">Location:</div>
+                    <div class="info-details">
+                        Medhipatnam<br>
+                        Hyderabad, 535022
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">✉️</div>
+                    <div class="info-title">Email:</div>
+                    <div class="info-details">
+                        <a href="mailto:NutrigazeOrg@example.com">NutrigazeOrg@example.com</a>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">📞</div>
+                    <div class="info-title">Call:</div>
+                    <div class="info-details">
+                        <a href="tel:+15589554885555">+1 5589 55488 555</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-section">
+                <div class="map-placeholder">
+                    <div class="map-text">
+                        📍 Find us in Hyderabad<br>
+                        <small>Interactive map location</small>
+                    </div>
+                </div>
+                <p style="color: #64748b; font-size: 0.9rem; max-width: 300px;">
+                    Visit our office in Medhipatnam, Hyderabad. We're centrally located and easily accessible by public transport.
+                </p>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <div class="cta-title">Ready to Get Started?</div>
+            <div class="cta-text">Contact us today to learn more about our waste management solutions</div>
+            <div class="cta-buttons">
+                <a href="tel:+15589554885555" class="cta-button primary">Call Now</a>
+                <a href="mailto:NutrigazeOrg@example.com" class="cta-button">Send Email</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

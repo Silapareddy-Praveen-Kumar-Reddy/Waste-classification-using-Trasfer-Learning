@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Waste Classifier - Upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+    <style>
+      @keyframes fade-slide {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade-slide {
+        animation: fade-slide 0.6s ease-out forwards;
+      }
+
+      /* Header Styles */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding: 15px 0;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+        letter-spacing: 1px;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: #00a753;
+      }
+
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #00a753;
+        transition: width 0.3s ease;
+      }
+
+      .nav-links a:hover::after,
+      .nav-links a.active::after {
+        width: 100%;
+      }
+
+      /* Adjust body padding for fixed navbar */
+      body {
+        padding-top: 80px;
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+        
+        .logo {
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100 font-sans">
+    <!-- Navigation Header -->
+    <nav class="navbar">
+      <div class="nav-content">
+        <a href="/" class="logo">MUNICIPAL WASTE CLASSIFICATION</a>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/blog">About</a></li>
+          <li><a href="/predict" class="active">Predict</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="max-w-xl mx-auto py-12 px-6 bg-white shadow rounded-xl mt-10">
+      <h1 class="text-2xl font-bold text-green-600 mb-2 text-center">
+        Waste Classification
+      </h1>
+      <p class="text-gray-600 text-center mb-6">
+        Drag and drop or click to upload an image of waste to classify
+      </p>
+
+      <!-- Upload Form -->
+      <form
+        method="POST"
+        action="/predict"
+        enctype="multipart/form-data"
+        class="space-y-4"
+        id="upload-form"
+      >
+        <!-- Drag-and-Drop Zone -->
+        <label
+          for="file"
+          class="flex flex-col items-center justify-center w-full h-48 px-4 transition bg-white border-2 border-dashed rounded-lg cursor-pointer hover:border-green-400"
+          id="drop-area"
+        >
+          <input
+            type="file"
+            name="file"
+            id="file"
+            class="hidden"
+            accept="image/*"
+            required
+          />
+          <span class="text-gray-500">Drop image here or click to upload</span>
+          <img
+            id="preview"
+            class="mt-4 h-32 hidden object-contain"
+            alt="Preview"
+          />
+        </label>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
+        >
+          Classify Waste
+        </button>
+      </form>
+
+      <!-- Result Section -->
+      {% if result %}
+      <div
+        class="mt-8 p-4 bg-green-50 border border-green-200 rounded shadow-md transition transform duration-500 ease-out animate-fade-slide"
+      >
+        <!-- Optional checkmark -->
+        <div class="flex justify-center mb-4">
+          <svg
+            class="h-10 w-10 text-green-500 animate-bounce"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        <h2 class="text-lg font-bold text-green-700 text-center">
+          Prediction Result
+        </h2>
+        <p class="mt-2 text-center text-gray-700">
+          <strong>Category:</strong>
+          {{ result.prediction.predicted_class }}<br />
+          <strong>Confidence:</strong>
+          {{ result.prediction.confidence_percentage | round(2) }}%
+        </p>
+        <img
+          src="{{ result.filepath }}"
+          alt="Uploaded Image"
+          class="mt-4 rounded shadow mx-auto"
+        />
+
+        {% if result.recycling_info %}
+        <div class="mt-6">
+          <h3 class="text-green-700 font-semibold mb-1">
+            Recycling Instructions:
+          </h3>
+          <ul class="list-disc list-inside text-gray-700 text-sm">
+            <li><strong>Disposal:</strong> {{ result.recycling_info.disposal }}</li>
+            <li><strong>Tips:</strong> {{ result.recycling_info.tips }}</li>
+            <li>
+              <strong>Impact:</strong>
+              {{ result.recycling_info.environmental_impact }}
+            </li>
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Image Preview Script -->
+    <script>
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("file");
+      const preview = document.getElementById("preview");
+
+      dropArea.addEventListener("click", () => fileInput.click());
+
+      dropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropArea.classList.add("border-green-400", "bg-green-50");
+      });
+
+      dropArea.addEventListener("dragleave", () => {
+        dropArea.classList.remove("border-green-400", "bg-green-50");
+      });
+
+      dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropArea.classList.remove("border-green-400", "bg-green-50");
+        fileInput.files = e.dataTransfer.files;
+        showPreview(fileInput.files[0]);
+      });
+
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+          showPreview(fileInput.files[0]);
+        }
+      });
+
+      function showPreview(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+          preview.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Navbar scroll effect
+      window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+          navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+        } else {
+          navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+        }
+      });
+    </script>
+  </body>
+</html>
