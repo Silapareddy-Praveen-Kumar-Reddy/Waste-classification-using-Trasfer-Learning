@@ -1,12 +1,13 @@
-import os
 import logging
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+import os
+
+import numpy as np
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from PIL import Image
+from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.applications.vgg16 import preprocess_input
 from werkzeug.utils import secure_filename
-from PIL import Image
-import numpy as np
 
 # ---------------------------------------------------------------------------
 # Configuration
