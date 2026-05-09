@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: waste-classifier
+    runtime: python
+    rootDir: Project files
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MODEL_PATH
+        value: vgg16.h5
+      - key: FLASK_DEBUG
+        value: false
