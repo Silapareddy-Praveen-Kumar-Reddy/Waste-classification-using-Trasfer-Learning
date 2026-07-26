@@ -5,3 +5,7 @@ numpy>=1.24,<2.0
 Werkzeug>=2.3,<4.0
 gunicorn>=21.2,<23.0
 python-dotenv>=1.0,<2.0
+# Step 3: HTTP client for calling TF Serving REST API
+requests>=2.31,<3.0
+# Step 4: Kafka client for async queue (used by app_tfserving.py and worker.py)
+kafka-python>=2.0,<3.0

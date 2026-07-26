@@ -1,0 +1,29 @@
+# Python cache / bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# User-uploaded images (runtime data, not build artefact)
+static/uploads/
+
+# Training notebooks — not needed in the container
+Notebooks/
+Data/
+
+# Model file — mounted as a volume or baked in via docker-compose
+# Comment out the next line if you want to COPY the model into the image
+# vgg16.h5
+
+# Environment / secrets
+.env
+*.env
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+*.swp

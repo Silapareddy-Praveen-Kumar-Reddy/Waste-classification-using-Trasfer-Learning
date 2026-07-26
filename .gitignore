@@ -16,6 +16,13 @@ venv/
 *.tflite
 *.pb
 
+# Exported SavedModel — regenerate with: python scripts/export_savedmodel.py
+# (variables.data is 136 MB, exceeds GitHub's 100 MB limit)
+Project files/models/
+
+# Async worker SQLite results DB (runtime data)
+results.db
+
 # Uploads
 Project files/static/uploads/*
 !Project files/static/uploads/.gitkeep

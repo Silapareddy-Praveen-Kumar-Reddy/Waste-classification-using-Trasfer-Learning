@@ -1,0 +1,131 @@
+# =============================================================================
+# docker-compose.yml — Local MLOps Demo Stack
+# =============================================================================
+# Services:
+#   tf-serving  — TensorFlow Serving (REST on :8501)
+#   web         — Flask/gunicorn app (Step 3 variant: calls TF Serving)
+#   redpanda    — Kafka-compatible broker (Step 4 async queue)
+#   worker      — Async inference consumer (Step 4)
+#
+# Usage:
+#   # First time: export the SavedModel (needs TF installed locally)
+#   cd "Project files" && python scripts/export_savedmodel.py
+#
+#   # Then run the full stack:
+#   docker-compose up --build
+#
+#   # Test sync endpoint:
+#   curl -X POST -F "file=@test.jpg" http://localhost:8080/api/predict
+#
+#   # Test async endpoint:
+#   curl -X POST -F "file=@test.jpg" http://localhost:8080/api/predict/async
+#   curl http://localhost:8080/api/result/<request_id>
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # TF Serving — serves the SavedModel via REST and gRPC
+  # ---------------------------------------------------------------------------
+  tf-serving:
+    image: tensorflow/serving:latest
+    volumes:
+      # Mount the exported SavedModel directory
+      # Structure expected: ./Project files/models/waste_classifier/1/
+      - ./Project files/models:/models
+    environment:
+      - MODEL_NAME=waste_classifier
+    ports:
+      - "8501:8501"   # REST
+      - "8500:8500"   # gRPC (available but not used by this stack)
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8501/v1/models/waste_classifier > /dev/null 2>&1 && exit 0 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Web — Flask app (TF Serving variant)
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: ./Project files
+      dockerfile: Dockerfile
+    # Override CMD to use the TF Serving variant of the app
+    command: >
+      gunicorn -w 4 -b 0.0.0.0:8080
+      --preload --timeout 120
+      --access-logfile - --error-logfile -
+      app_tfserving:app
+    environment:
+      - TF_SERVING_URL=http://tf-serving:8501
+      - SECRET_KEY=local-dev-key-change-in-prod
+      - PORT=8080
+      - KAFKA_BOOTSTRAP=redpanda:9092
+      - RESULTS_DB=/app/results.db
+    ports:
+      - "8080:8080"
+    volumes:
+      # Share the uploads folder so the worker can read images the web saved
+      - uploads:/app/static/uploads
+      # Shared SQLite results DB between web and worker
+      - results:/app
+    depends_on:
+      - tf-serving
+      - redpanda
+
+  # ---------------------------------------------------------------------------
+  # Redpanda — Kafka-compatible broker (simpler config than vanilla Kafka)
+  # ---------------------------------------------------------------------------
+  redpanda:
+    image: redpandadata/redpanda:latest
+    command:
+      - redpanda
+      - start
+      - --smp=1
+      - --memory=512M
+      - --reserve-memory=0M
+      - --overprovisioned
+      - --node-id=0
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr=internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr=internal://redpanda:8082,external://localhost:18082
+    ports:
+      - "19092:19092"   # Kafka external (host access for debugging)
+      - "18082:18082"   # Pandaproxy external
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster info --brokers=localhost:9092 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Worker — Kafka consumer for async inference (Step 4)
+  # ---------------------------------------------------------------------------
+  worker:
+    build:
+      context: ./Project files
+      dockerfile: Dockerfile
+    command: python worker.py
+    environment:
+      - KAFKA_BOOTSTRAP=redpanda:9092
+      - TF_SERVING_URL=http://tf-serving:8501
+      - RESULTS_DB=/app/results.db
+    volumes:
+      # Must share the same uploads volume so worker can open the image files
+      - uploads:/app/static/uploads
+      # Shared SQLite results DB
+      - results:/app
+    depends_on:
+      - tf-serving
+      - redpanda
+
+# ---------------------------------------------------------------------------
+# Named volumes — shared between web and worker containers
+# ---------------------------------------------------------------------------
+volumes:
+  uploads:
+  results:
