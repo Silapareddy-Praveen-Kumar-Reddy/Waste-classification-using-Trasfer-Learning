@@ -4,46 +4,240 @@
     <meta charset="UTF-8" />
     <title>Waste Classification Result</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Your waste item has been classified. See disposal instructions, environmental impact, and recycling tips." />
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <style>
+      @keyframes fade-slide {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes bar-grow { from { width: 0%; } }
+      @keyframes pop-in {
+        0%   { transform: scale(0.7); opacity: 0; }
+        70%  { transform: scale(1.08); }
+        100% { transform: scale(1);   opacity: 1; }
+      }
+      @keyframes confetti-fall {
+        0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+        100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+      }
+      .fade-slide { animation: fade-slide 0.55s ease-out forwards; }
+      .bar-grow   { animation: bar-grow  1.1s ease-out forwards; }
+      .delay-1 { animation-delay: 0.10s; opacity: 0; }
+      .delay-2 { animation-delay: 0.20s; opacity: 0; }
+      .delay-3 { animation-delay: 0.30s; opacity: 0; }
+      .delay-4 { animation-delay: 0.40s; opacity: 0; }
+      .delay-5 { animation-delay: 0.50s; opacity: 0; }
+      .delay-6 { animation-delay: 0.60s; opacity: 0; }
+      .confetti-piece {
+        position: fixed; width: 10px; height: 10px; border-radius: 2px;
+        animation: confetti-fall linear forwards;
+        pointer-events: none; z-index: 9999;
+      }
+      .navbar { background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%); }
+    </style>
   </head>
-  <body class="bg-gray-50 font-sans">
-    <div class="max-w-3xl mx-auto p-6 mt-10 bg-white shadow rounded-xl">
-      <h1 class="text-2xl font-bold text-green-600 mb-4 text-center">
-        Classification Result
-      </h1>
 
-      <!-- Image Preview -->
-      <div class="text-center">
+  <body class="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 min-h-screen font-sans">
+
+    <!-- Navbar -->
+    <nav class="navbar shadow-lg px-6 py-3 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <span class="text-2xl">♻️</span>
+        <span class="text-white font-bold text-lg tracking-wide">WasteClassifier</span>
+      </a>
+      <a href="/predict" class="text-emerald-200 hover:text-white text-sm font-medium transition-colors">
+        ← Classify Another
+      </a>
+    </nav>
+
+    <div class="max-w-2xl mx-auto px-4 py-10 space-y-6">
+
+      <!-- Header -->
+      <div class="text-center fade-slide delay-1">
+        <h1 class="text-3xl font-extrabold text-emerald-700 tracking-tight">Classification Result</h1>
+        <p class="text-gray-500 text-sm mt-1">Here's what we found and how to handle it responsibly</p>
+      </div>
+
+      <!-- Image + Category card -->
+      <div class="bg-white rounded-2xl shadow-md p-6 flex flex-col sm:flex-row items-center gap-6 fade-slide delay-2">
         <img
           src="{{ result.filepath }}"
-          alt="Uploaded Waste"
-          class="w-72 h-72 object-cover mx-auto mb-4 rounded-lg shadow"
+          alt="Uploaded Waste Image"
+          class="w-40 h-40 object-cover rounded-xl shadow-lg border-4 border-emerald-100 flex-shrink-0"
         />
+        <div class="flex-1 text-center sm:text-left space-y-3">
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Predicted Category</p>
+            <p class="text-2xl font-black
+              {% if result.prediction.predicted_class == 'Biodegradable' %}text-green-600
+              {% elif result.prediction.predicted_class == 'Recyclable' %}text-blue-600
+              {% else %}text-red-500{% endif %}">
+              {% if result.prediction.predicted_class == 'Biodegradable' %}🌿
+              {% elif result.prediction.predicted_class == 'Recyclable' %}♻️
+              {% else %}🗑️{% endif %}
+              {{ result.prediction.predicted_class }}
+            </p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Confidence</p>
+            <p class="text-xl font-bold text-gray-800">{{ result.prediction.confidence_percentage | round(1) }}%</p>
+          </div>
+          {% if result.recycling_info %}
+          <div>
+            {% set impact = result.recycling_info.environmental_impact | lower %}
+            {% if 'low' in impact %}
+              <span class="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full ring-1 ring-green-300">
+                🌍 Low Environmental Impact
+              </span>
+            {% elif 'medium' in impact %}
+              <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full ring-1 ring-yellow-300">
+                🌍 Medium Environmental Impact
+              </span>
+            {% else %}
+              <span class="inline-flex items-center gap-1 bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full ring-1 ring-red-300">
+                🌍 High Environmental Impact
+              </span>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
       </div>
 
-      <!-- Prediction Details -->
-      <div class="text-gray-800 space-y-3">
-        <p>
-          <strong>Predicted Category:</strong>
-          <span class="text-green-700 font-semibold">
-            {{ result.prediction.predicted_class }}
-          </span>
-        </p>
-        <p>
-          <strong>Confidence Score:</strong>
-          {{ result.prediction.confidence_percentage | round(2) }}%
-        </p>
+      <!-- Probability bar chart -->
+      <div class="bg-white rounded-2xl shadow-md p-6 fade-slide delay-3">
+        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Confidence Breakdown</h2>
+        <div class="space-y-3">
+          {% for label, color in [('Biodegradable','bg-green-500'), ('Recyclable','bg-blue-500'), ('Trash','bg-red-400')] %}
+          {% set pct = (result.prediction.all_probabilities[label] * 100) | round(1) %}
+          <div>
+            <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+              <span>{{ label }}</span><span>{{ pct }}%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+              <div class="{{ color }} h-3 rounded-full bar-grow" style="width: {{ pct }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
 
-      <!-- Back Button -->
-      <div class="mt-6 text-center">
-        <a
-          href="/predict"
-          class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full"
-        >
-          Upload Another Image
+      <!-- Recycling steps -->
+      <div class="bg-white rounded-2xl shadow-md p-6 fade-slide delay-4">
+        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Disposal Steps</h2>
+        {% set pred = result.prediction.predicted_class %}
+        {% if pred == 'Biodegradable' %}
+          {% set steps = [
+            ('🧹', 'Collect', 'Gather the item separately from non-organic waste.'),
+            ('🔍', 'Check', 'Remove any plastic wrap or non-organic attachments.'),
+            ('🪣', 'Compost bin', 'Place in your green bin or home compost heap.'),
+            ('🌱', 'Done!', 'It will break down naturally — excellent for the environment!')
+          ] %}
+        {% elif pred == 'Recyclable' %}
+          {% set steps = [
+            ('🚿', 'Rinse', 'Clean off food residue or liquids thoroughly.'),
+            ('🔍', 'Check label', 'Look for the ♻️ symbol to confirm recyclability.'),
+            ('📦', 'Sort', 'Place in the correct coloured recycling bin or bag.'),
+            ('🏪', 'Drop off', 'Use a local recycling point if no kerbside collection available.')
+          ] %}
+        {% else %}
+          {% set steps = [
+            ('🧤', 'Handle safely', 'Wear gloves if the item is sharp or hazardous.'),
+            ('🔍', 'Double-check', 'Can any part be recycled? Separate components if so.'),
+            ('🗑️', 'General waste', 'Place in the general / black bin for landfill collection.'),
+            ('💡', 'Reduce next time', 'Consider a reusable or recyclable alternative in future.')
+          ] %}
+        {% endif %}
+        <ol class="space-y-3">
+          {% for icon, title, desc in steps %}
+          <li class="flex items-start gap-3">
+            <span class="flex-shrink-0 w-9 h-9 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-lg">{{ icon }}</span>
+            <div>
+              <p class="font-semibold text-gray-800 text-sm">{{ loop.index }}. {{ title }}</p>
+              <p class="text-gray-500 text-sm">{{ desc }}</p>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        {% if result.recycling_info %}
+        <div class="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+          <p class="text-emerald-800 text-sm">💡 <strong>Tip:</strong> {{ result.recycling_info.tips }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Common items card -->
+      <div class="bg-white rounded-2xl shadow-md p-6 fade-slide delay-5">
+        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Common Items in This Category</h2>
+        {% set pred = result.prediction.predicted_class %}
+        {% if pred == 'Biodegradable' %}
+          {% set items = ['🍌 Banana peel', '🍎 Apple core', '☕ Coffee grounds', '🥚 Eggshells', '🌿 Garden clippings', '🍞 Stale bread'] %}
+        {% elif pred == 'Recyclable' %}
+          {% set items = ['📰 Newspapers', '🥫 Tin cans', '🍶 Glass bottles', '📦 Cardboard boxes', '🧴 Plastic bottles', '🛍️ Paper bags'] %}
+        {% else %}
+          {% set items = ['🍫 Crisp packets', '🧴 Blister packs', '🪥 Toothbrushes', '💊 Medicine packaging', '🩹 Plasters', '🧻 Soiled paper'] %}
+        {% endif %}
+        <div class="flex flex-wrap gap-2">
+          {% for item in items %}
+          <span class="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1.5 rounded-full">{{ item }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 fade-slide delay-6">
+        <a href="/predict"
+          class="flex-1 text-center bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-3 px-6 rounded-xl shadow transition-all">
+          ♻️ Classify Another Image
         </a>
+        <button id="shareBtn" onclick="shareResult()"
+          class="flex-1 bg-white hover:bg-gray-50 active:scale-95 border-2 border-emerald-600 text-emerald-700 font-bold py-3 px-6 rounded-xl shadow transition-all">
+          📋 Copy Result
+        </button>
       </div>
+
     </div>
+
+    <div id="confetti-container"></div>
+
+    <script>
+      // Confetti
+      const COLORS = ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+      function launchConfetti() {
+        const c = document.getElementById('confetti-container');
+        for (let i = 0; i < 70; i++) {
+          const p = document.createElement('div');
+          p.className = 'confetti-piece';
+          p.style.cssText = `left:${Math.random()*100}vw;top:-20px;background:${COLORS[Math.floor(Math.random()*COLORS.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*.8}s;`;
+          c.appendChild(p);
+          p.addEventListener('animationend', () => p.remove());
+        }
+      }
+      window.addEventListener('load', launchConfetti);
+
+      // Share / copy
+      function shareResult() {
+        const cat  = "{{ result.prediction.predicted_class }}";
+        const pct  = "{{ result.prediction.confidence_percentage | round(1) }}";
+        {% if result.recycling_info %}
+        const tip  = "{{ result.recycling_info.tips | replace('"', '\\"') }}";
+        {% else %}
+        const tip  = "";
+        {% endif %}
+        const text = `♻️ Waste Classification Result\n\nCategory: ${cat}\nConfidence: ${pct}%${tip ? '\n💡 Tip: ' + tip : ''}\n\nClassified with WasteClassifier`;
+        if (navigator.share) {
+          navigator.share({ title: 'Waste Classification', text });
+        } else {
+          navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('shareBtn');
+            const orig = btn.textContent;
+            btn.textContent = '✅ Copied!';
+            btn.classList.add('bg-emerald-50');
+            setTimeout(() => { btn.textContent = orig; btn.classList.remove('bg-emerald-50'); }, 2000);
+          });
+        }
+      }
+    </script>
+
   </body>
 </html>
