@@ -71,6 +71,9 @@ services:
       - uploads:/app/static/uploads
       # Shared SQLite results DB between web and worker
       - results:/app
+      # Bind-mount templates + static so edits are live without rebuild
+      - ./Project files/templates:/app/templates:ro
+      - ./Project files/static:/app/static:ro
     depends_on:
       - tf-serving
       - redpanda

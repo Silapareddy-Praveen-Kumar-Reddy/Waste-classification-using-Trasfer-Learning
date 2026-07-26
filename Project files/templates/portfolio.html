@@ -34,21 +34,78 @@
         animation: confetti-fall linear forwards;
         pointer-events: none; z-index: 9999;
       }
-      .navbar { background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%); }
+
+      /* ── Consistent navbar (matches all other pages) ── */
+      .navbar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding: 15px 0;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+      }
+      .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+        letter-spacing: 1px;
+      }
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+        margin: 0; padding: 0;
+      }
+      .nav-links a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+      .nav-links a:hover,
+      .nav-links a.active { color: #00a753; }
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px; left: 0;
+        width: 0; height: 2px;
+        background: #00a753;
+        transition: width 0.3s ease;
+      }
+      .nav-links a:hover::after,
+      .nav-links a.active::after { width: 100%; }
+      body { padding-top: 80px; }
+      @media (max-width: 768px) {
+        .nav-links { display: none; }
+        .logo { font-size: 1.2rem; }
+      }
     </style>
   </head>
 
   <body class="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 min-h-screen font-sans">
 
-    <!-- Navbar -->
-    <nav class="navbar shadow-lg px-6 py-3 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2">
-        <span class="text-2xl">♻️</span>
-        <span class="text-white font-bold text-lg tracking-wide">WasteClassifier</span>
-      </a>
-      <a href="/predict" class="text-emerald-200 hover:text-white text-sm font-medium transition-colors">
-        ← Classify Another
-      </a>
+    <!-- Navbar — consistent with all pages -->
+    <nav class="navbar">
+      <div class="nav-content">
+        <a href="/" class="logo">MUNICIPAL WASTE CLASSIFICATION</a>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/blog">About</a></li>
+          <li><a href="/predict" class="active">Predict</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
     </nav>
 
     <div class="max-w-2xl mx-auto px-4 py-10 space-y-6">
