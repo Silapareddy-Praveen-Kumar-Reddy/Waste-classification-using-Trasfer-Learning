@@ -17,10 +17,10 @@ TF Serving REST format (instances → predictions):
     → { "predictions": [[p_biodeg, p_recyclable, p_trash]] }
 """
 
-import os
-import sys
 import logging
+import os
 import shutil
+import sys
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)

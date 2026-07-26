@@ -261,8 +261,9 @@ def api_predict_async():
     """
     # Lazy import so the sync path works even without kafka-python installed
     try:
-        from kafka import KafkaProducer  # noqa: F401
         import json as _json
+
+        from kafka import KafkaProducer  # noqa: F401
     except ImportError:
         return jsonify({"error": "Async queue not configured (kafka-python not installed)"}), 501
 
